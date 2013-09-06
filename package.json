@@ -1,0 +1,24 @@
+{
+  "name": "mongoose-notifiable",
+  "version": "0.0.0",
+  "description": "Mongoose plugin making a model able to send custom notifications over different transports when custom events occur",
+  "main": "index.coffee",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gulthor/mongoose-notifiable.git"
+  },
+  "keywords": [
+    "mongoose",
+    "notifications",
+    "notify",
+    "events"
+  ],
+  "author": "Jean-Baptiste Musso <jbmusso+github@gmail.com> (https://github.com/gulthor)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gulthor/mongoose-notifiable/issues"
+  }
+}

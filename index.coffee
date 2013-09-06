@@ -1,0 +1,3 @@
+plugin = require("./lib/plugin")
+
+module.exports = {plugin}
