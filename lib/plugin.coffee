@@ -4,12 +4,12 @@ transports =
   email: EmailTransport
 
 
-module.exports = (schema, options) ->
+buildEventsFields = (events) ->
   fields =
     notifications: {}
 
   # Dynamically build Mongoose "notifications" field and populate with each registered events
-  for eventName, event of options.events
+  for eventName, event of events
     fields.notifications[eventName] = {}
 
     # Set default behavior (enabled/disabled) for each event's actions
@@ -25,7 +25,12 @@ module.exports = (schema, options) ->
         type: Boolean
         default: def
 
-  schema.add(fields)
+  return fields
+
+
+module.exports = (schema, options) ->
+  # Attach all possible events to Schema
+  schema.add(buildEventsFields(options.events))
 
   """
   Register event to current model.
