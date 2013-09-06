@@ -65,6 +65,6 @@ registerEvent = (model, eventName, eventTransports) ->
       model.on(eventName, (payload = {}) ->
         options = transport.options or {}
 
-        # Call the action
-        transports[transportName].buildMessage.call(this, options, payload)
+        # Call transport action
+        transports[transportName].sendMessage.call(this, options, payload)
       )

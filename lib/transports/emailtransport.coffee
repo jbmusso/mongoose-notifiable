@@ -1,5 +1,5 @@
 module.exports = class EmailTransport
-  @buildMessage: (options, payload) ->
+  @sendMessage: (options, payload) ->
 
     fill = (option) =>
       if option?
