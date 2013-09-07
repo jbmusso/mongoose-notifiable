@@ -1,7 +1,6 @@
 EmailTransport = require("./transports/emailtransport")
 
 
-
 buildEventsFields = (events) ->
   fields =
     notifications: {}
@@ -14,14 +13,14 @@ buildEventsFields = (events) ->
     for actionName, action of event
       # Set default value to false if default behavior is not set or is not boolean
       if event[actionName].default? and typeof event[actionName].default is "boolean"
-        def = event[actionName].default
+        notifyByDefault = event[actionName].default
       else
-        def = false
+        notifyByDefault = false
 
       # Attach event to Schema
       fields.notifications[eventName][actionName] =
         type: Boolean
-        default: def
+        default: notifyByDefault
 
   return fields
 
