@@ -55,6 +55,21 @@ module.exports = (schema, options) ->
   )
 
 
+  """
+  Notify another user that an event was triggered.
+
+  For example: when 'this' (current user) sends 'user' a private message, user will emit the "privateMessageReceived" event.
+  """
+  schema.method("notify", (user, eventName, eventData = {}) ->
+    event =
+      name: eventName
+      triggeredBy: this
+      data: eventData
+
+    user.emit(event.name, event)
+  )
+
+
   registerEvent = (receiver, eventName, eventTransports) ->
     #TODO: loop through @notifications rather? Ie --> should we register a send email (or any other transport) event when the recipient didn't confirm their email address? Most likely not.
     # ... Maybe add a schema.model("acceptsTransport", (transportName) -> ...) method to model.
@@ -62,12 +77,7 @@ module.exports = (schema, options) ->
       # Check if user wishes to be notified of this event
       if receiver.wantsToBeNotifiedOf(eventName, transportName)
         # Register event
-        receiver.on(eventName, (triggeredBy, eventData = {}) ->
-          event =
-            name: eventName
-            data: eventData
-            triggeredBy: triggeredBy
-
+        receiver.on(eventName, (event) ->
           # Call transport action
           transports[transportName].sendMessage(receiver, event, (err, status) ->
             # console.log err, status
