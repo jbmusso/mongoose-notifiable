@@ -1,39 +1,39 @@
+TransportEventHandler = require("../transporteventhandler")
+
 module.exports = class Transport
-  constructor: (@settings, @events) ->
+  constructor: (@settings, events) ->
     console.log "Building", @constructor.name
 
     # Define transport short name for easier picking of transport options (see @getEventSetting())
     # ie "EmailTransport" -> "email"
     @transportName = @constructor.name.substring(0, @constructor.name.length - 9).toLowerCase()
 
-
-  getEventSetting: (settingName, context) ->
-    return @events[context.event.name][@transportName].options?[settingName]
+    @eventHandlers = @buildEventHandlers(events)
 
 
-  getTransportSetting: (settingName) ->
-    return @settings[settingName]
+  buildMessage: ->
+    throw "Transport.buildMessage() must be overridden"
 
 
-  resolveSetting: (settingName, context) ->
-    eventSetting = @getEventSetting(settingName, context)
-    if eventSetting?
-      return @applySetting(eventSetting, context)
-
-    defaultSetting = @getTransportSetting(settingName)
-    if defaultSetting?
-      return @applySetting(defaultSetting, context)
-
-    return @applySetting()
+  sendMessage: ->
+    throw "Transport.sendMessage() must be overridden"
 
 
-  applySetting: (setting, context) ->
-    if not setting?
-      return "No setting set"
+  buildEventHandlers: (events) ->
+    eventHandlers = {}
+    for eventName, eventSetting of events
+      console.log "- Building event handler", eventName, "for", @transportName
 
-    # Execute setting function
-    if typeof setting is "function"
-      return setting.call(context.receiver, context.event)
+      eventHandler = new TransportEventHandler(this, eventSetting[@transportName])
+      eventHandlers[eventName] = eventHandler
+    
+    return eventHandlers
 
-    # Return setting as string
-    return setting
+
+  getEventHandler: (event) ->
+    return @eventHandlers[event.name]
+
+
+  getDefaultSetting: (settingName) ->
+    return @settings.defaultSettings[settingName]
+

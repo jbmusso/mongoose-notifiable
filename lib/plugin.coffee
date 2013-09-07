@@ -69,5 +69,7 @@ module.exports = (schema, options) ->
             triggeredBy: triggeredBy
 
           # Call transport action
-          transports[transportName].sendMessage(receiver, event)
+          transports[transportName].sendMessage(receiver, event, (err, status) ->
+            # console.log err, status
+          )
         )
