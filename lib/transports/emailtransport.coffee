@@ -9,11 +9,11 @@ module.exports = class EmailTransport
   Get default transport setting, or custom event setting
   """
   resolveSetting: (settingName, context) ->
-    eventSetting = @events[context.event.name].email.options[settingName]
+    eventSetting = @getEventSetting(settingName, context)
     if eventSetting?
       return applySetting(eventSetting, context)
 
-    defaultSetting = @settings[settingName]
+    defaultSetting = @getTransportSetting(settingName)
     if defaultSetting?
       return applySetting(defaultSetting, context)
 
@@ -33,6 +33,14 @@ module.exports = class EmailTransport
       html: @resolveSetting("html", context)
 
     receiver.sendEmail(message, (err, status) ->)
+
+
+  getEventSetting: (settingName, context) ->
+    return @events[context.event.name].email.options?[settingName]
+
+
+  getTransportSetting: (settingName) ->
+    return @settings[settingName]
 
 
 applySetting = (setting, context) ->
