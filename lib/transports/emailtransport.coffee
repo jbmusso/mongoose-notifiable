@@ -1,22 +1,47 @@
 module.exports = class EmailTransport
-  @sendMessage: (options, payload) ->
+  constructor: (@settings, @events) ->
+    console.log "EmailTransport constructor"
+    console.log @settings
+    console.log @events
 
-    fill = (option) =>
-      if option?
-        if typeof option is "function"
-          message =
-            sender: payload.sender
-            receiver: this
-            body: payload.message
-          return option(message, payload)
-        return option
-      return "No option set"
+
+  """
+  Get default transport setting, or custom event setting
+  """
+  resolveSetting: (settingName, context) ->
+    eventSetting = @events[context.event.name].email.options[settingName]
+    if eventSetting?
+      return applySetting(eventSetting, context)
+
+    defaultSetting = @settings[settingName]
+    if defaultSetting?
+      return applySetting(defaultSetting, context)
+
+    return applySetting()
+
+
+  sendMessage: (receiver, event) ->
+    context =
+      receiver: receiver
+      event: event
 
     message =
-      from: options.from
-      to: "<#{@email.address}>"
-      subject: fill(options.subject)
-      text: fill(options.body.text)
-      html: fill(options.body.html)
+      from: @resolveSetting("from", context)
+      to: "<#{receiver.email.address}>"
+      subject: @resolveSetting("subject", context)
+      text: @resolveSetting("text", context)
+      html: @resolveSetting("html", context)
 
-    @sendEmail(message, (err, status) ->)
+    receiver.sendEmail(message, (err, status) ->)
+
+
+applySetting = (setting, context) ->
+  if not setting?
+    return "No setting set"
+
+  # Execute setting function
+  if typeof setting is "function"
+    return setting.call(context.receiver, context.event)
+
+  # Return setting as string
+  return setting

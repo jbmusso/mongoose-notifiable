@@ -1,7 +1,5 @@
 EmailTransport = require("./transports/emailtransport")
 
-transports =
-  email: EmailTransport
 
 
 buildEventsFields = (events) ->
@@ -29,6 +27,9 @@ buildEventsFields = (events) ->
 
 
 module.exports = (schema, options) ->
+  transports =
+    email: new EmailTransport(options.transports.email, options.events)
+
   # Attach all possible events to Schema
   schema.add(buildEventsFields(options.events))
 
@@ -55,16 +56,19 @@ module.exports = (schema, options) ->
   )
 
 
-registerEvent = (model, eventName, eventTransports) ->
-  #TODO: loop through @notifications rather? Ie --> should we register a send email (or any other transport) event when the recipient didn't confirm their email address? Most likely not.
-  # ... Maybe add a schema.model("acceptsTransport", (transportName) -> ...) method to model.
-  for transportName, transport of eventTransports
-    # Check if user wishes to be notified of this event
-    if model.wantsToBeNotifiedOf(eventName, transportName)
-      # Register event
-      model.on(eventName, (payload = {}) ->
-        options = transport.options or {}
+  registerEvent = (receiver, eventName, eventTransports) ->
+    #TODO: loop through @notifications rather? Ie --> should we register a send email (or any other transport) event when the recipient didn't confirm their email address? Most likely not.
+    # ... Maybe add a schema.model("acceptsTransport", (transportName) -> ...) method to model.
+    for transportName, transport of eventTransports
+      # Check if user wishes to be notified of this event
+      if receiver.wantsToBeNotifiedOf(eventName, transportName)
+        # Register event
+        receiver.on(eventName, (triggeredBy, eventData = {}) ->
+          event =
+            name: eventName
+            data: eventData
+            triggeredBy: triggeredBy
 
-        # Call transport action
-        transports[transportName].sendMessage.call(this, options, payload)
-      )
+          # Call transport action
+          transports[transportName].sendMessage(receiver, event)
+        )
