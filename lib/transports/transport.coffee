@@ -1,14 +1,23 @@
 TransportEventHandler = require("../transporteventhandler")
 
+
 module.exports = class Transport
   constructor: (@settings, events) ->
     console.log "Building", @constructor.name
 
-    # Define transport short name for easier picking of transport options (see @getEventSetting())
-    # ie "EmailTransport" -> "email"
-    @transportName = @constructor.name.substring(0, @constructor.name.length - 9).toLowerCase()
-
+    @transportName = @getTransportName()
     @eventHandlers = @buildEventHandlers(events)
+
+
+  """
+  Define transport short name for easier picking of transport options, ie. "EmailTransport" becomes "email"
+
+  @see getEventSetting() method below
+
+  @return {String}
+  """
+  getTransportName: ->
+    return @constructor.name.substring(0, @constructor.name.length - 9).toLowerCase()
 
 
   buildMessage: ->
@@ -19,6 +28,11 @@ module.exports = class Transport
     throw "Transport.sendMessage() must be overridden"
 
 
+  """
+  EventHandlers are responsible for handling an event for a given transport.
+
+  @return {Array}
+  """
   buildEventHandlers: (events) ->
     eventHandlers = {}
     for eventName, eventSetting of events

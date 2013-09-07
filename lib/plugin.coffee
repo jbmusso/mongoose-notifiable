@@ -41,6 +41,10 @@ module.exports = (schema, options) ->
       registerEvent(this, eventName, eventTransports)
   )
 
+
+  """
+  Save current user notifications preferences, for each event and for each transport.
+  """
   schema.method("setNotificationsOptions", (formData = {}, callback) ->
     for event, transporters of @notifications.toObject()
       for transport of transporters
@@ -50,6 +54,12 @@ module.exports = (schema, options) ->
     @save(callback)
   )
 
+
+  """
+  Indicates if current user is interested in being notified of a given event by a given transport.
+
+  @return {Boolean}
+  """
   schema.method("wantsToBeNotifiedOf", (eventName, transport) ->
     return @notifications[eventName][transport]
   )

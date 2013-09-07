@@ -1,7 +1,9 @@
 """
 Handle an Event for a given Transport.
 
-This class is responsible for 
+For a given Transport (= for a given way of being notified), this class is responsible for:
+  1) retrieving custom eventSettings (if available) or defaultTransportSetting (if available)
+  2) passing these settings to the Transport so the notification can be generated and delivered to its destination.
 """
 module.exports = class TransportEventHandler
   constructor: (@transport, @eventSettings) ->
