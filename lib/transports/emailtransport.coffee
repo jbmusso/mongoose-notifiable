@@ -1,22 +1,26 @@
-module.exports = class EmailTransport
-  @buildMessage: (options, payload) ->
+Transport = require("./transport")
 
-    fill = (option) =>
-      if option?
-        if typeof option is "function"
-          message =
-            sender: payload.sender
-            receiver: this
-            body: payload.message
-          return option(message, payload)
-        return option
-      return "No option set"
+module.exports = class EmailTransport extends Transport
+  buildMessage: (receiver, context) ->
+    handler = @getEventHandler(context.event)
 
     message =
-      from: options.from
-      to: "<#{@email.address}>"
-      subject: fill(options.subject)
-      text: fill(options.body.text)
-      html: fill(options.body.html)
+      from: handler.resolveSetting("from", context)
+      to: "<#{receiver.email.address}>"
+      subject: handler.resolveSetting("subject", context)
+      text: handler.resolveSetting("text", context)
+      html: handler.resolveSetting("html", context)
 
-    @sendEmail(message, (err, status) ->)
+    return message
+
+
+  sendMessage: (receiver, event, callback) ->
+    context =
+      receiver: receiver
+      event: event
+
+    message = @buildMessage(receiver, context)
+
+    receiver.sendEmail(message, (err, status) ->
+      callback(err, status)
+    )

@@ -1,6 +1,6 @@
 {
   "name": "mongoose-notifiable",
-  "version": "0.0.0",
+  "version": "0.1",
   "description": "Mongoose plugin making a model able to send custom notifications over different transports when custom events occur",
   "main": "index.coffee",
   "scripts": {
