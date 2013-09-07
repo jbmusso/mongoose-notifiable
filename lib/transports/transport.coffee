@@ -1,9 +1,9 @@
 module.exports = class Transport
   constructor: (@settings, @events) ->
     console.log "Building", @constructor.name
-    console.log @settings
-    console.log @events
 
+    # Define transport short name for easier picking of transport options (see @getEventSetting())
+    # ie "EmailTransport" -> "email"
     @transportName = @constructor.name.substring(0, @constructor.name.length - 9).toLowerCase()
 
 

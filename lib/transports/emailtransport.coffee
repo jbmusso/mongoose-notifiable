@@ -1,10 +1,6 @@
 Transport = require("./transport")
 
 module.exports = class EmailTransport extends Transport
-  """
-  Get default transport setting, or custom event setting
-  """
-
   sendMessage: (receiver, event) ->
     context =
       receiver: receiver
